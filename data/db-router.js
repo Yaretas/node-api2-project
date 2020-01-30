@@ -1,9 +1,9 @@
 const express = require('express');
 const router = express.Router();
-const db = require('./db.js');
+const Db = require('./db.js');
 
 router.get('/', (res,req) =>{
-    db.find()
+    Db.find()
         .then(myPost => {
             res.status(200).json(myPost);
         })
@@ -12,6 +12,19 @@ router.get('/', (res,req) =>{
         })
 });
 //POST	/api/posts	Creates a post using the information sent inside the request body.
+router.post('/', (req, res) =>{
+    Db.insert(req.body)
+        .then(post => {
+            if(!req.body.title || !req.body.contents) {
+                res.status(400).json({ errorMessage: "Please provide title and contents for the post." });
+            } else {
+                res.status(201).json(post);
+            }
+        })
+        .catch (err => {
+            res.status(500).json({ errorMessage: "There was an error while saving the post to the database." })
+        })
+})
 //POST	/api/posts/:id/comments	Creates a comment for the post with the specified id using information sent inside of the request body.
 //GET	/api/posts	Returns an array of all the post objects contained in the database.
 //GET	/api/posts/:id	Returns the post object with the specified id.
